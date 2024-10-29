@@ -14,7 +14,7 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://chris:chris@localhost:5672/hello")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -43,10 +43,6 @@ func main() {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	if len(os.Args) < 2 {
-		log.Printf("Usage: %s [info] [warning] [error]", os.Args[0])
-		os.Exit(0)
-	}
 	for _, s := range os.Args[1:] {
 		log.Printf("Binding queue %s to exchange %s with routing key %s", q.Name, "logs_direct", s)
 		err = ch.QueueBind(

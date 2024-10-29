@@ -6,17 +6,10 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Panicf("%s: %s", msg, err)
-	}
-}
 
 func randomString(l int) string {
 	bytes := make([]byte, l)
@@ -95,20 +88,8 @@ func main() {
 	n := bodyFrom(os.Args)
 
 	log.Printf(" [x] Requesting fib(%d)", n)
-	res, err := fibonacciRPC(n)
+	res, err := fibonacciRPC(2)
 	failOnError(err, "Failed to handle RPC request")
 
 	log.Printf(" [.] Got %d", res)
-}
-
-func bodyFrom(args []string) int {
-	var s string
-	if (len(args) < 2) || os.Args[1] == "" {
-		s = "30"
-	} else {
-		s = strings.Join(args[1:], " ")
-	}
-	n, err := strconv.Atoi(s)
-	failOnError(err, "Failed to convert arg to integer")
-	return n
 }

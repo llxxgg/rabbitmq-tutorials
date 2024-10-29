@@ -17,7 +17,7 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://chris:chris@localhost:5672/hello")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -56,10 +56,10 @@ func main() {
 
 func bodyFrom(args []string) string {
 	var s string
-	if (len(args) < 2) || os.Args[1] == "" {
+	if (len(args) < 3) || os.Args[2] == "" {
 		s = "hello"
 	} else {
-		s = strings.Join(args[1:], " ")
+		s = strings.Join(args[2:], " ")
 	}
 	return s
 }

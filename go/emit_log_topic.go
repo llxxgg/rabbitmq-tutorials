@@ -10,14 +10,8 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Panicf("%s: %s", msg, err)
-	}
-}
-
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://chris:chris@localhost:5672/hello")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -54,14 +48,10 @@ func main() {
 	log.Printf(" [x] Sent %s", body)
 }
 
-func bodyFrom(args []string) string {
-	var s string
-	if (len(args) < 3) || os.Args[2] == "" {
-		s = "hello"
-	} else {
-		s = strings.Join(args[2:], " ")
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Panicf("%s: %s", msg, err)
 	}
-	return s
 }
 
 func severityFrom(args []string) string {
@@ -70,6 +60,16 @@ func severityFrom(args []string) string {
 		s = "anonymous.info"
 	} else {
 		s = os.Args[1]
+	}
+	return s
+}
+
+func bodyFrom(args []string) string {
+	var s string
+	if (len(args) < 3) || os.Args[2] == "" {
+		s = "hello"
+	} else {
+		s = strings.Join(args[2:], " ")
 	}
 	return s
 }

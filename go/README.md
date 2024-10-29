@@ -32,8 +32,10 @@ Code examples are executed via `go run`:
 
 [Tutorial four: Routing](https://www.rabbitmq.com/tutorials/tutorial-four-go.html)
 
-    go run receive_logs_direct.go info warn
+    go run receive_logs_direct.go info 
+    go run receive_logs_direct.go warn
     go run emit_log_direct.go warn "a warning"
+    go run emit_log_direct.go info "a infoing"
 
 [Tutorial five: Topics](https://www.rabbitmq.com/tutorials/tutorial-five-go.html)
 

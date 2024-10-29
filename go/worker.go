@@ -1,8 +1,10 @@
 package main
 
 import (
-	"bytes"
+	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -15,7 +17,7 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://chris:chris@localhost:5672/hello")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -40,14 +42,16 @@ func main() {
 	)
 	failOnError(err, "Failed to set QoS")
 
+	num, _ := strconv.Atoi(os.Args[1])
+
 	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		false,  // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		q.Name,                          // queue
+		fmt.Sprintf("consumer_%d", num), // consumer
+		false,                           // auto-ack
+		false,                           // exclusive
+		false,                           // no-local
+		false,                           // no-wait
+		nil,                             // args
 	)
 	failOnError(err, "Failed to register a consumer")
 
@@ -55,10 +59,9 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
-			dotCount := bytes.Count(d.Body, []byte("."))
-			t := time.Duration(dotCount)
-			time.Sleep(t * time.Second)
+			log.Printf("Received a message: %s, woker: %d", d.Body, num)
+
+			time.Sleep(time.Duration(num) * time.Second)
 			log.Printf("Done")
 			d.Ack(false)
 		}

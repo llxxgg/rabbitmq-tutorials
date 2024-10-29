@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -16,8 +17,18 @@ func failOnError(err error, msg string) {
 	}
 }
 
+func bodyFrom(args []string) string {
+	var s string
+	if (len(args) < 3) || os.Args[2] == "" {
+		s = "hello"
+	} else {
+		s = strings.Join(args[2:], " ")
+	}
+	return s
+}
+
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://chris:chris@localhost:5672/hello")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -39,26 +50,20 @@ func main() {
 	defer cancel()
 
 	body := bodyFrom(os.Args)
-	err = ch.PublishWithContext(ctx,
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,
-		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "text/plain",
-			Body:         []byte(body),
-		})
-	failOnError(err, "Failed to publish a message")
-	log.Printf(" [x] Sent %s", body)
-}
 
-func bodyFrom(args []string) string {
-	var s string
-	if (len(args) < 2) || os.Args[1] == "" {
-		s = "hello"
-	} else {
-		s = strings.Join(args[1:], " ")
+	for i := 0; i < 10; i++ {
+		err = ch.PublishWithContext(ctx,
+			"",     // exchange
+			q.Name, // routing key
+			false,  // mandatory
+			false,
+			amqp.Publishing{
+				DeliveryMode: amqp.Persistent,
+				ContentType:  "text/plain",
+				Body:         []byte(fmt.Sprintf("%s %d", body, i)),
+			})
+		failOnError(err, "Failed to publish a message")
+		log.Printf(" [x] Sent %s", body)
 	}
-	return s
+
 }
