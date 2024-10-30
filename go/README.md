@@ -48,3 +48,7 @@ Code examples are executed via `go run`:
     go run rpc_client.go 10
 
 To learn more, see [`rabbitmq/amqp091-go`](https://github.com/rabbitmq/amqp091-go).
+
+# ttl + 死信队列
+    go run receive_dlx.go
+    go run emit_dlx.go 
